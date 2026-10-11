@@ -2,6 +2,17 @@
 
 Mentor Program Tracker API: Express 5 + strict TypeScript, backed by Postgres.
 
+## Project context
+
+This is a portfolio project that may be reviewed in a job interview. Every change should hold up to a reviewer reading the code and commit history. Priorities, in order:
+
+1. **Secure**: validate all request input at the boundary, use parameterized queries only (via the ORM), never log or return secrets or stack traces, keep dependencies current, and treat CodeQL alerts as blockers.
+2. **Simple**: the smallest design that does the job well. No speculative abstractions, layers, or dependencies; each one must earn its place.
+3. **Professional**: consistent structure and naming, clear error responses, meaningful tests, focused commits and PRs with useful descriptions.
+4. **Impressive**: stand out through polish and judgment, not complexity. For example: thorough tests, a clean README with setup steps, good API error design, and well-explained decisions in PRs.
+
+When these conflict, prefer secure and simple over impressive.
+
 ## Commands
 
 - `npm run dev`: run the server with reload (tsx), default port 4100

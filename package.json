@@ -5,11 +5,16 @@
   "main": "dist/server.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "build": "tsc",
+    "build": "tsc -p tsconfig.build.json",
     "start": "node dist/server.js",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc",
     "lint": "eslint .",
-    "test": "vitest run"
+    "test": "vitest run",
+    "postinstall": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:deploy": "prisma migrate deploy",
+    "db:seed": "prisma db seed",
+    "db:reset": "prisma migrate reset"
   },
   "repository": {
     "type": "git",
@@ -23,19 +28,30 @@
   },
   "homepage": "https://github.com/SCO6360/mentorporgramtracker_API#readme",
   "dependencies": {
-    "express": "^5.3.0"
+    "@prisma/adapter-pg": "7.10.0",
+    "@prisma/client": "7.10.0",
+    "dotenv": "18.0.7",
+    "express": "^5.3.0",
+    "pg": "8.23.1"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@faker-js/faker": "10.6.0",
     "@types/express": "^5.0.6",
     "@types/node": "^26.6.5",
+    "@types/pg": "8.23.1",
     "@types/supertest": "^7.2.1",
     "eslint": "^10.12.0",
     "prettier": "^3.9.10",
+    "prisma": "7.10.0",
     "supertest": "^7.3.1",
     "tsx": "^4.23.15",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.71.1",
     "vitest": "^5.0.3"
+  },
+  "overrides": {
+    "deepmerge-ts": "8.0.2",
+    "mysql2": "3.24.5"
   }
 }

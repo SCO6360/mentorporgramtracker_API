@@ -13,6 +13,19 @@ This is a portfolio project that may be reviewed in a job interview. Every chang
 
 When these conflict, prefer secure and simple over impressive.
 
+## Data-flow checks
+
+Before opening a PR that touches an endpoint or data model, trace each request from input to response and confirm:
+
+- **In**: every field from the body, params, query, or headers is validated (type, length, format) before use; unknown fields are rejected or stripped.
+- **Who**: the caller is allowed to read or change this specific record, not just this kind of record.
+- **Store**: only intended fields are written (no passing raw request bodies to the ORM); multi-step writes use a transaction.
+- **Out**: responses return only what the caller needs; no password hashes, internal IDs that leak other users' data, or other secrets.
+- **Errors**: failures return a consistent JSON shape with the right status code (400/401/403/404/409/500) and no stack traces or SQL details.
+- **Sense check**: the flow matches the domain (e.g. a mentee cannot approve their own session, deleted records cannot be updated) and the endpoint name and method match what it does.
+
+Summarize these checks in the PR description.
+
 ## Commands
 
 - `npm run dev`: run the server with reload (tsx), default port 4100

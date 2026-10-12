@@ -29,17 +29,31 @@ Summarize these checks in the PR description.
 ## Commands
 
 - `npm run dev`: run the server with reload (tsx), default port 4100
-- `npm run typecheck`, `npm run lint`, `npm test`: the same three checks CI runs; all must pass before a PR
+- `npm run typecheck`, `npm run lint`, `npm test`: must pass before a PR (CI also migrates, seeds, and builds)
 - `npm run build` / `npm start`: compile to `dist/` and run it
 - `docker compose up -d`: local Postgres 18 on `127.0.0.1:5440` (db `mentormatch`, user/pass `mentor`)
+- `npm run db:migrate`: create and apply a migration after editing `prisma/schema.prisma`
+- `npm run db:seed`: replace all data with the deterministic Faker seed (100 users)
+- `npm run db:deploy`: apply existing migrations without creating new ones (CI, production)
 
 Copy `.env.example` to `.env` for local config. Never commit `.env`.
 
 ## Layout
 
 - `src/app.ts`: builds and exports the Express `app` (no `listen`), so tests can import it
-- `src/server.ts`: entry point; only starts the server
+- `src/server.ts`: entry point; loads `.env` via `src/env.ts`, then starts the server
+- `src/db.ts`: the single shared Prisma client; import `prisma` from here
+- `src/generated/prisma/`: generated client (gitignored, rebuilt on `npm install`); never edit
+- `prisma/schema.prisma`: data model; `prisma/migrations/`: committed SQL migrations, never edit one that has been merged
+- `prisma/seed.ts`: dev/CI seed data; refuses to run when `NODE_ENV=production`
 - Tests sit next to the code as `*.test.ts` and use Vitest + Supertest against `app`
+
+## Data model
+
+- `User` with `role` ADMIN, MENTOR, or MENTEE
+- `Program`: a cohort with start and end dates
+- `Mentorship`: one mentor paired with one mentee in a program; a mentee has at most one mentor per program
+- Rules Prisma cannot express (no self-mentoring, end date after start) are CHECK constraints in migrations
 
 ## Conventions
 

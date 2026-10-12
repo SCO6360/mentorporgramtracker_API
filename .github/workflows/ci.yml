@@ -11,6 +11,22 @@ permissions:
 jobs:
   check:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: mentor
+          POSTGRES_PASSWORD: mentor
+          POSTGRES_DB: mentormatch
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U mentor"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://mentor:mentor@localhost:5432/mentormatch
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
@@ -20,4 +36,7 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
       - run: npm run lint
+      - run: npm run db:deploy
+      - run: npm run db:seed
       - run: npm test
+      - run: npm run build

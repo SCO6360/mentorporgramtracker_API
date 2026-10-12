@@ -1,0 +1,76 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  MENTOR
+  MENTEE
+}
+
+enum MentorshipStatus {
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+model User {
+  id        String   @id @default(uuid()) @db.Uuid
+  email     String   @unique
+  firstName String   @map("first_name")
+  lastName  String   @map("last_name")
+  role      Role
+  jobTitle  String?  @map("job_title")
+  company   String?
+  bio       String?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  mentoring  Mentorship[] @relation("MentorMentorships")
+  mentoredIn Mentorship[] @relation("MenteeMentorships")
+
+  @@map("users")
+}
+
+model Program {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String   @unique
+  description String?
+  startDate   DateTime @map("start_date") @db.Date
+  endDate     DateTime @map("end_date") @db.Date
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  mentorships Mentorship[]
+
+  @@map("programs")
+}
+
+// One mentor paired with one mentee within a program.
+model Mentorship {
+  id        String           @id @default(uuid()) @db.Uuid
+  programId String           @map("program_id") @db.Uuid
+  mentorId  String           @map("mentor_id") @db.Uuid
+  menteeId  String           @map("mentee_id") @db.Uuid
+  status    MentorshipStatus @default(ACTIVE)
+  startedAt DateTime         @default(now()) @map("started_at")
+  endedAt   DateTime?        @map("ended_at")
+  createdAt DateTime         @default(now()) @map("created_at")
+  updatedAt DateTime         @updatedAt @map("updated_at")
+
+  program Program @relation(fields: [programId], references: [id])
+  mentor  User    @relation("MentorMentorships", fields: [mentorId], references: [id])
+  mentee  User    @relation("MenteeMentorships", fields: [menteeId], references: [id])
+
+  // A mentee has at most one mentor per program.
+  @@unique([programId, menteeId])
+  @@index([mentorId])
+  @@index([menteeId])
+  @@map("mentorships")
+}
